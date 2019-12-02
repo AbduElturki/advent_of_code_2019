@@ -19,7 +19,6 @@ def runGravityAssist(noun, verb):
     return intcode[0]
 
 def findVerbAndNoun(output):
-    result = 0
     for verb in range(99):
         for noun in range(99):
             result = runGravityAssist(noun, verb)
