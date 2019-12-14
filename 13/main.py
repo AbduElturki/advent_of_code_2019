@@ -32,28 +32,26 @@ def countBlockTiles():
         numOfBlocks += tiles[i].count(2)
     return numOfBlocks
 
-def aiPong(tiles):
-    padLoc = None
-    ballLoc = None
-    for y in range(len(tiles)):
-        for x in range(len(tiles[y])):
-            if tiles[y][x] == 4:
-                ballLoc = x
-            if tiles[y][x] == 3:
-                padLoc = x
-    if padLoc == None or ballLoc == None:
-        return None
-    if ballLoc > padLoc:
-        return 1
-    elif ballLoc < padLoc:
-        return -1
-    else:
-        return 0
 
 def runArcadeAi():
+    highscore = 0
     tiles = [[0 for _ in range(37)] for _ in range(50)]
-    system = intcodeMachine('input')
-    ai = False
+    def aiPong():
+        for y in range(len(tiles)):
+            for x in range(len(tiles[y])):
+                if tiles[y][x] == 4:
+                    print(x,y)
+                    ballLoc = x
+                if tiles[y][x] == 3:
+                    padLoc = x
+        if ballLoc > padLoc:
+            return 1
+        elif ballLoc < padLoc:
+            return -1
+        else:
+            return 0
+    system = intcodeMachine('input', aiPong)
+    system.intcode[0] = 2
     while True:
         x = system.run()
         y = system.run()
@@ -68,15 +66,15 @@ def runArcadeAi():
         tiles[y][x] = tile
         for i in range(50):
             print(*list(map(coloredTile, tiles[i])))
-        print('-------------------------------------')
-        if ai:
-            nextMove = aiPong(tiles)
-            if nextMove != None:
-                system.addInput(nextMove)
+        print('-' * 37)
+        print('Score: ', highscore)
+        print('-' * 37)
+    return highscore
 
 def runArcade():
     tiles = [[0 for _ in range(37)] for _ in range(50)]
     system = intcodeMachine('input')
+    system.intcode[0] = 2
     while True:
         x = system.run()
         y = system.run()
@@ -93,5 +91,6 @@ def runArcade():
         print('-------------------------------------')
 
 if __name__ == '__main__':
-    #print('Part 1:', countBlockTiles())
-    runArcadeAi()
+    highscore = runArcadeAi()
+    print('Part 1:', countBlockTiles())
+    print('PArt 2:', highscore)
