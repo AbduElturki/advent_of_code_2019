@@ -8,6 +8,7 @@ class intcodeMachine:
         self.intcode.extend([0] * 1000000)
         self.modes = [0,0,0]
         self.inputs = inputs
+        self.halt = False
 
     def parseOpcode(self,intcode):
         opcode = intcode % 100
@@ -23,12 +24,14 @@ class intcodeMachine:
         self.intcode = list(map(int,
                                 open(self.intcodeFile).read().strip().split(',')))
         self.intcode.extend([0] * 1000000)
+        self.halt = False
 
     def addInput(self, newAddition):
         self.inputs.append(newAddition)
 
     def run(self):
-        while self.intcode[self.pc] != 99:
+        while not self.halt:
+        #while self.intcode[self.pc] != 99:
             opcode = self.parseOpcode(self.intcode[self.pc])
             operand1 = self.intcode[self.pc+1] if self.modes[0] == 1\
                         else self.intcode[self.intcode[self.pc+1] + self.rb] if self.modes[0] == 2\
@@ -46,13 +49,16 @@ class intcodeMachine:
                 self.intcode[operand3Addr] = operand1 * operand2
                 self.pc += 4
             elif opcode == 3:
-                if len(self.inputs) == 0:
-                    userInput = input('IntcodeMachine Shell >> ')
-                    self.intcode[operand3Addr] = int(userInput)
-                elif type(self.inputs) == list:
-                    self.intcode[operand3Addr] = self.inputs.pop(0)
+                if type(self.inputs) == list:
+                    if len(self.inputs) == 0:
+                        userInput = input('IntcodeMachine Shell >> ')
+                        self.intcode[self.intcode[self.pc+1]] = int(userInput)
+                    else:
+                        self.intcode[self.intcode[self.pc+1]] = self.inputs.pop(0)
+                elif callable(self.inputs):
+                    self.intcode[self.intcode[self.pc+1]] = self.inputs()
                 else:
-                    self.intcode[operand3Addr] = self.inputs.pop(0)
+                    self.intcode[self.intcode[self.pc+1]] = self.inputs
                 self.pc += 2
             elif opcode == 4:
                 self.intcode[0] = operand1
@@ -83,6 +89,8 @@ class intcodeMachine:
             elif opcode == 9:
                 self.rb += operand1
                 self.pc += 2
+            elif opcode == 99:
+                self.halt = True
             else:
                 print("I broke at index: " + str(self.pc))
                 break
