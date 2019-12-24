@@ -31,7 +31,6 @@ class intcodeMachine:
 
     def run(self):
         while not self.halt:
-        #while self.intcode[self.pc] != 99:
             opcode = self.parseOpcode(self.intcode[self.pc])
             operand1 = self.intcode[self.pc+1] if self.modes[0] == 1\
                         else self.intcode[self.intcode[self.pc+1] + self.rb] if self.modes[0] == 2\
@@ -61,7 +60,7 @@ class intcodeMachine:
                     self.intcode[self.intcode[self.pc+1]] = self.inputs
                 self.pc += 2
             elif opcode == 4:
-                self.intcode[0] = operand1
+                #self.intcode[0] = operand1
                 self.pc += 2
                 return operand1
             elif opcode == 5:
@@ -93,5 +92,6 @@ class intcodeMachine:
                 self.halt = True
             else:
                 print("I broke at index: " + str(self.pc))
-                break
+                print(self.intcode[self.pc-2:self.pc+10])
+                self.halt = True
 
